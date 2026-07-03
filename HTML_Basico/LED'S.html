@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Control LEDs</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.0.5/mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; background: #1a1a2e; color: white; }
+        h1 { margin-bottom: 30px; }
+        .led-card { background: #16213e; border-radius: 12px; padding: 30px; margin: 10px; width: 200px; text-align: center; }
+        button { padding: 10px 25px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-on  { background: #00b894; color: white; }
+        .btn-off { background: #d63031; color: white; }
+        #status { margin-top: 20px; font-size: 14px; color: #a0a0a0; }
+    </style>
+</head>
+<body>
+    <h1>🔆 Control de LEDs</h1>
+
+    <div class="led-card">
+        <h2>LED 1</h2>
+        <button class="btn-on"  onclick="publicar('iot/led1', '1')">Encender</button>
+        <button class="btn-off" onclick="publicar('iot/led1', '0')">Apagar</button>
+    </div>
+
+    <div class="led-card">
+        <h2>LED 2</h2>
+        <button class="btn-on"  onclick="publicar('iot/led2', '1')">Encender</button>
+        <button class="btn-off" onclick="publicar('iot/led2', '0')">Apagar</button>
+    </div>
+
+    <p id="status">Conectando al broker...</p>
+
+    <script>
+        const client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
+
+        client.on("connect", () => {
+            document.getElementById("status").textContent = "✅ Conectado al broker";
+        });
+
+        client.on("error", (err) => {
+            document.getElementById("status").textContent = "❌ Error: " + err.message;
+        });
+
+        function publicar(topic, valor) {
+            client.publish(topic, valor, { qos: 1 });
+            console.log(`Publicado → ${topic}: ${valor}`);
+        }
+    </script>
+</body>
+</html>
